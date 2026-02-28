@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion – Recettes de famille</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-amber-50 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white rounded-2xl shadow-lg p-10 w-full max-w-sm border border-amber-100 text-center">
+
+        <div class="text-5xl mb-4">🍽️</div>
+        <h1 class="text-2xl font-bold text-amber-800 mb-1">Recettes de famille</h1>
+        <p class="text-gray-400 text-sm mb-8">Entrez le mot de passe pour accéder au site.</p>
+
+        {% if error %}
+        <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-6">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form action="/login" method="post" class="space-y-4">
+            <input
+                type="password"
+                name="password"
+                required
+                autofocus
+                placeholder="Mot de passe"
+                class="w-full border border-gray-200 rounded-lg px-4 py-3 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+            <button
+                type="submit"
+                class="w-full bg-amber-600 text-white font-semibold py-3 rounded-lg hover:bg-amber-700 transition"
+            >
+                Entrer
+            </button>
+        </form>
+
+    </div>
+
+</body>
+</html>

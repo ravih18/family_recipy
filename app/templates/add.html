@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{% if recipe %}Modifier la recette{% else %}Ajouter une recette{% endif %}{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-amber-800 mb-8">
+    {% if recipe %}Modifier « {{ recipe.title }} »{% else %}Ajouter une recette{% endif %}
+</h1>
+
+<form action="{% if recipe %}/recipe/{{ recipe.id }}/edit{% else %}/add{% endif %}" method="post"
+    class="bg-white rounded-2xl shadow p-8 space-y-6 border border-amber-100">
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-1">Titre *</label>
+        <input type="text" name="title" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            placeholder="Ex : Tarte aux pommes de mamie"
+            value="{{ recipe.title if recipe else '' }}">
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-1">Description</label>
+        <input type="text" name="description"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            placeholder="Une courte description de la recette"
+            value="{{ recipe.description if recipe else '' }}">
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-semibold text-amber-800 mb-1">Temps de préparation (min)</label>
+            <input type="number" name="prep_time" min="0"
+                class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value="{{ recipe.prep_time if recipe else '' }}">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-amber-800 mb-1">Temps de cuisson (min)</label>
+            <input type="number" name="cook_time" min="0"
+                class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value="{{ recipe.cook_time if recipe else '' }}">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-amber-800 mb-1">Portions</label>
+            <input type="number" name="servings" min="1"
+                class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value="{{ recipe.servings if recipe else '' }}">
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-1">Ingrédients *</label>
+        <p class="text-xs text-gray-400 mb-2">Un ingrédient par ligne. Ex : 200g de farine</p>
+        <textarea name="ingredients" required rows="8"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 font-mono text-sm"
+            placeholder="200g de farine&#10;3 œufs&#10;100ml de lait">{{ recipe.ingredients if recipe else '' }}</textarea>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-1">Instructions *</label>
+        <p class="text-xs text-gray-400 mb-2">Une étape par ligne.</p>
+        <textarea name="instructions" required rows="8"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
+            placeholder="Préchauffer le four à 180°C&#10;Mélanger la farine et les œufs&#10;Cuire 30 minutes">{{ recipe.instructions if recipe else '' }}</textarea>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-1">Commentaires & variantes</label>
+        <p class="text-xs text-gray-400 mb-2">Suggestions d'accompagnement, variantes possibles, astuces…</p>
+        <textarea name="notes" rows="4"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
+            placeholder="Ex : Se marie très bien avec une salade verte. Peut se faire avec du poulet à la place du veau.">{{ recipe.notes if recipe else '' }}</textarea>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-3">Origine de la recette</label>
+        <div class="flex flex-wrap gap-2">
+            {% for tag in all_tags.origin %}
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="tag_ids" value="{{ tag.id }}"
+                    class="accent-amber-600 w-4 h-4"
+                    {% if selected_tag_ids is defined and tag.id in selected_tag_ids %}checked{% endif %}>
+                <span class="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-full px-3 py-1 hover:bg-amber-100 transition">
+                    {{ tag.name }}
+                </span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-amber-800 mb-3">Type de plat</label>
+        <div class="flex flex-wrap gap-2">
+            {% for tag in all_tags.type %}
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="tag_ids" value="{{ tag.id }}"
+                    class="accent-amber-600 w-4 h-4"
+                    {% if selected_tag_ids is defined and tag.id in selected_tag_ids %}checked{% endif %}>
+                <span class="text-sm text-gray-700 bg-orange-50 border border-orange-200 rounded-full px-3 py-1 hover:bg-orange-100 transition">
+                    {{ tag.name }}
+                </span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex gap-4 pt-2">
+        <button type="submit"
+            class="bg-amber-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-amber-700 transition">
+            {% if recipe %}Enregistrer les modifications{% else %}Enregistrer la recette{% endif %}
+        </button>
+        <a href="{% if recipe %}/recipe/{{ recipe.id }}{% else %}/{% endif %}"
+            class="text-amber-600 font-semibold px-8 py-3 rounded-lg border border-amber-300 hover:bg-amber-50 transition">
+            Annuler
+        </a>
+    </div>
+
+</form>
+{% endblock %}
