@@ -1,10 +1,20 @@
-.PHONY: dev build up down logs pull deploy install-docker
+.PHONY: dev docker-dev build up down logs pull deploy install-docker
 
-# ─── Local ────────────────────────────────────────────────────────────────────
+# ─── Local sans Docker ────────────────────────────────────────────────────────
 
 # Lancer en local sans Docker
 dev:
 	uv run python -m uvicorn app.main:app --reload
+
+# ─── Docker dev (test local avec Docker) ──────────────────────────────────────
+
+# Lancer en Docker local avec hot reload (test avant push)
+docker-dev:
+	docker compose -f docker-compose.dev.yml up --build
+
+# Arrêter le Docker dev
+docker-dev-down:
+	docker compose -f docker-compose.dev.yml down
 
 # ─── Docker local ─────────────────────────────────────────────────────────────
 
@@ -74,9 +84,9 @@ help:
 	@echo "Commandes disponibles :"
 	@echo ""
 	@echo "  Local :"
-	@echo "    make dev          → lancer en local sans Docker"
-	@echo "    make build        → Docker local (app seule)"
-	@echo "    make up           → Docker local (app + nginx)"
+	@echo "    make dev            → lancer en local sans Docker"
+	@echo "    make docker-dev     → Docker local avec hot reload"
+	@echo "    make docker-dev-down → arrêter le Docker dev"
 	@echo "    make down         → arrêter Docker"
 	@echo "    make logs         → voir tous les logs"
 	@echo "    make logs-app     → logs de l'app seulement"
