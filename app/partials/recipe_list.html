@@ -1,0 +1,43 @@
+{% if recipes %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for recipe in recipes %}
+    <a href="/recipe/{{ recipe.id }}" class="block bg-white rounded-2xl shadow hover:shadow-lg transition p-5 border border-amber-100 hover:border-amber-300">
+        <h2 class="text-xl font-semibold text-amber-900 mb-2">{{ recipe.title }}</h2>
+        {% if recipe.description %}
+        <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ recipe.description }}</p>
+        {% endif %}
+        <div class="flex gap-4 text-xs text-amber-600 font-medium">
+            {% if recipe.prep_time %}
+            <span>⏱ Prép : {{ recipe.prep_time }} min</span>
+            {% endif %}
+            {% if recipe.cook_time %}
+            <span>🔥 Cuisson : {{ recipe.cook_time }} min</span>
+            {% endif %}
+            {% if recipe.servings %}
+            <span>🍽 {{ recipe.servings }} portions</span>
+            {% endif %}
+        </div>
+        {% if recipe.tags %}
+        <div class="flex flex-wrap gap-1 mt-3">
+            {% for tag in recipe.tags %}
+            <span class="text-xs px-2 py-0.5 rounded-full
+                {% if tag.category == 'origin' %} bg-amber-100 text-amber-700
+                {% else %} bg-orange-100 text-orange-700 {% endif %}">
+                {% if tag.category == 'type' %}
+                    {% if tag.name == "Cocktail" %}🍹{% else %}🍴{% endif %}
+                {% endif %}
+                {{ tag.name }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-20 text-amber-400">
+    <p class="text-5xl mb-4">🔍</p>
+    <p class="text-xl font-medium">Aucune recette trouvée.</p>
+</div>
+{% endif %}

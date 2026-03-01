@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, Query
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -75,6 +75,38 @@ def list_recipes(request: Request, session: Session = Depends(get_session)):
         "request": request,
         "recipes": recipes,
         "all_tags": all_tags,
+    })
+
+
+@app.get("/search")
+def search_recipes(
+    request: Request,
+    q: str = "",
+    tags: List[int] = Query(default=[]),
+    session: Session = Depends(get_session),
+):
+    if not is_authenticated(request):
+        return RedirectResponse(url="/login")
+
+    query = select(Recipe)
+
+    # Filtre par recherche textuelle
+    if q:
+        query = query.where(
+            Recipe.title.ilike(f"%{q}%") |
+            Recipe.description.ilike(f"%{q}%")
+        )
+
+    recipes = session.exec(query).all()
+
+    # Filtre par tags (après la requête car relation many-to-many)
+    if tags:
+        recipes = [r for r in recipes if any(t.id in tags for t in r.tags)]
+
+    return templates.TemplateResponse("partials/recipe_list.html", {
+        "request": request,
+        "recipes": recipes,
+        "selected_tags": tags,
     })
 
 
