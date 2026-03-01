@@ -70,6 +70,7 @@ def list_recipes(request: Request, session: Session = Depends(get_session)):
     if not is_authenticated(request):
         return RedirectResponse(url="/login")
     recipes = session.exec(select(Recipe)).all()
+    recipes = sorted(recipes, key=lambda r: r.id, reverse=True)
     all_tags = get_all_tags(session)
     return templates.TemplateResponse("list.html", {
         "request": request,
@@ -83,6 +84,7 @@ def search_recipes(
     request: Request,
     q: str = "",
     tags: List[int] = Query(default=[]),
+    sort: str = "recent",
     session: Session = Depends(get_session),
 ):
     if not is_authenticated(request):
@@ -99,14 +101,31 @@ def search_recipes(
 
     recipes = session.exec(query).all()
 
-    # Filtre par tags (après la requête car relation many-to-many)
+    # Filtre par tags
     if tags:
         recipes = [r for r in recipes if any(t.id in tags for t in r.tags)]
+
+    # Tri
+    type_order = ["Entrée", "Plat", "Dessert", "Boisson", "Cocktail"]
+
+    if sort == "recent":
+        recipes = sorted(recipes, key=lambda r: r.id, reverse=True)
+    elif sort == "oldest":
+        recipes = sorted(recipes, key=lambda r: r.id)
+    elif sort == "alpha":
+        recipes = sorted(recipes, key=lambda r: r.title.lower())
+    elif sort == "type":
+        def type_sort_key(recipe):
+            type_tags = [t for t in recipe.tags if t.category == "type"]
+            if type_tags:
+                name = type_tags[0].name
+                return type_order.index(name) if name in type_order else 99
+            return 99
+        recipes = sorted(recipes, key=type_sort_key)
 
     return templates.TemplateResponse("partials/recipe_list.html", {
         "request": request,
         "recipes": recipes,
-        "selected_tags": tags,
     })
 
 

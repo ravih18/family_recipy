@@ -72,7 +72,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-amber-800 mb-3">Origine de la recette</label>
+        <label class="block text-sm font-semibold text-amber-800 mb-3">🌍 Origine de la recette</label>
         <div class="flex flex-wrap gap-2">
             {% for tag in all_tags.origin %}
             <label class="flex items-center gap-2 cursor-pointer">
@@ -88,7 +88,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-amber-800 mb-3">Type de plat</label>
+        <label class="block text-sm font-semibold text-amber-800 mb-3">🍴 Type de plat</label>
         <div class="flex flex-wrap gap-2">
             {% for tag in all_tags.type %}
             <label class="flex items-center gap-2 cursor-pointer">
@@ -96,11 +96,24 @@
                     class="accent-amber-600 w-4 h-4"
                     {% if selected_tag_ids is defined and tag.id in selected_tag_ids %}checked{% endif %}>
                 <span class="text-sm text-gray-700 bg-orange-50 border border-orange-200 rounded-full px-3 py-1 hover:bg-orange-100 transition">
-                    {{ tag.name }}
+                    {% if tag.name == "Cocktail" %}🍹{% else %}🍴{% endif %} {{ tag.name }}
                 </span>
             </label>
             {% endfor %}
         </div>
+    </div>
+
+    <div>
+        {% for tag in all_tags.diet %}
+        {% if tag.name == "Végétarien" %}
+        <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="tag_ids" value="{{ tag.id }}"
+                class="accent-amber-600 w-4 h-4"
+                {% if selected_tag_ids is defined and tag.id in selected_tag_ids %}checked{% endif %}>
+            <span class="text-sm font-semibold text-amber-800">🥗 Recette végétarienne</span>
+        </label>
+        {% endif %}
+        {% endfor %}
     </div>
 
     <div class="flex gap-4 pt-2">
