@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from fastapi import FastAPI, Request, Form, Depends, Query
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
@@ -11,6 +11,8 @@ from app.database import create_db, get_session
 from app.models import Recipe, Tag
 from app.auth import is_authenticated, create_session_cookie, APP_PASSWORD, COOKIE_NAME
 from app.tags import init_tags, get_all_tags
+from app.pdf import generate_recipe_pdf
+import io
 
 # Chemins absolus basés sur l'emplacement de ce fichier
 BASE_DIR = Path(__file__).parent
@@ -205,6 +207,24 @@ def view_recipe(recipe_id: int, request: Request, session: Session = Depends(get
     if not recipe:
         return RedirectResponse(url="/")
     return templates.TemplateResponse("recipe.html", recipe_template_context(request, recipe))
+
+
+@app.get("/recipe/{recipe_id}/pdf")
+def download_recipe_pdf(recipe_id: int, request: Request, session: Session = Depends(get_session)):
+    if not is_authenticated(request):
+        return RedirectResponse(url="/login")
+    recipe = session.get(Recipe, recipe_id)
+    if not recipe:
+        return RedirectResponse(url="/")
+    ingredients = [i for i in recipe.ingredients.splitlines() if i.strip()]
+    instructions = [i for i in recipe.instructions.splitlines() if i.strip()]
+    pdf_bytes = generate_recipe_pdf(recipe, ingredients, instructions)
+    filename = f"{recipe.title.lower().replace(' ', '_')}.pdf"
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -7,6 +7,10 @@
 <div class="mb-6 flex justify-between items-center">
     <a href="/" class="text-amber-600 hover:underline text-sm">← Retour aux recettes</a>
     <div class="flex gap-2">
+        <a href="/recipe/{{ recipe.id }}/pdf"
+            class="bg-green-100 text-green-700 font-semibold px-4 py-2 rounded-lg hover:bg-green-200 transition text-sm">
+            📄 Télécharger PDF
+        </a>
         <a href="/recipe/{{ recipe.id }}/edit"
             class="bg-amber-100 text-amber-800 font-semibold px-4 py-2 rounded-lg hover:bg-amber-200 transition text-sm">
             ✏️ Modifier
